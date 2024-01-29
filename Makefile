@@ -1,8 +1,8 @@
 CC = gcc
-EXEC = htop
+EXEC = main
 SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
-CFLAGS = -Wall -Werror -Wextra
+#CFLAGS = -Wall -Werror -Wextra
 
 all : $(EXEC)
 
