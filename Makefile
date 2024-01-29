@@ -1,16 +1,20 @@
 CC = gcc
 EXEC = main
-SRC = $(wildcard *.c)
+CFLAGS = -Wall -Werror -Wextra
+OBJDIR = obj/
+SRCDIR = src/
+SRC = $(wildcard $(SRCDIR)*.c)
 OBJ = $(SRC:.c=.o)
-#CFLAGS = -Wall -Werror -Wextra
 
 all : $(EXEC)
 
-%.o : %.c
-	$(CC) -o $@ -c $<
-
 $(EXEC) : $(OBJ)
 	$(CC) -o $@ $^
+	cp $(SRCDIR)*.o $(OBJDIR)
+	rm -rf $(SRCDIR)*.o
+
+$(OBJDIR)%.o : $(SRCDIR)%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean :
 	rm -rf $(OBJ)
