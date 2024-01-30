@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
+#include <unistd.h>
+#include <string.h>
 #include "../headers/dataManager.h"
 
 int char_is_digit(char character){
@@ -23,40 +25,27 @@ int str_is_digit(char *str){
     return 1;
 }
 
-char* getProcessName(char *processDirFullName)
+char* getProcessName(char *processFileFullName)
 {
-//    struct dirent *de;  // Pointer for directory entry
-//    struct processData process;
-//    char *processDirFullName;
-//
-//    DIR *dr = opendir("processDirFullName"); // opendir() returns a pointer of DIR type.
-//
-//    if (dr == NULL)  // opendir returns NULL if couldn't open directory
-//    {
-//        printf("Could not open current directory" );
-//        return;
-//    }
-//
-//    while ((de = readdir(dr)) != NULL)
-//    {
-//        if(str_is_digit(de->d_name) == 1)
-//        {
-//            processDirFullName = "/proc/" + de->d_name;
-//            process.id = atoi(de->d_name);
-//            process.name = getProcessName(processDirFullName);
-//        }
-//    }
-//
-//    closedir(dr);
-return processDirFullName;
+    FILE *stream;
+
+    char line[256];
+    while(fgets(line, 256, *stream) != NULL){ // for each line of the file
+        // si la ligne contient "Name"
+        // récupérer le name
+        // set process.name
+    }
+
+    return processFileFullName;
 }
 
 void getData(){
     struct dirent *de;  // Pointer for directory entry
     struct processData process;
-    char *processDirFullName;
+    char *baseDirName = "/proc";
+    char *fileToReadName = "status";
 
-    DIR *dr = opendir("/proc"); // opendir() returns a pointer of DIR type.
+    DIR *dr = opendir(baseDirName); // opendir() returns a pointer of DIR type.
 
     if (dr == NULL)  // opendir returns NULL if couldn't open directory
     {
@@ -64,14 +53,21 @@ void getData(){
         return;
     }
 
+    char *fileName;
+    int numLetter;
+
     while ((de = readdir(dr)) != NULL)
     {
-        if(str_is_digit(de->d_name) == 1)
+        fileName = de->d_name;
+        if(str_is_digit(fileName) == 1)
         {
-            processDirFullName = strcat("/proc/", de->d_name);
-            process.id = atoi(de->d_name);
-            process.name = getProcessName(processDirFullName);
-            printf("%i %s", process.id, process.name);
+            numLetter = strlen(baseDirName) + strlen(fileName) + strlen(fileToReadName) + 2;
+            char processFileFullName[numLetter + 1];
+            snprintf(processFileFullName, sizeof(processFileFullName), "%s/%s/%s", baseDirName, fileName, fileToReadName);
+
+            process.id = atoi(fileName);
+            process.name = getProcessName(processFileFullName);
+            printf("%s\n", processFileFullName);
         }
     }
 

@@ -1,6 +1,6 @@
 CC = gcc
 EXEC = main
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -g3
 OBJDIR = obj/
 SRCDIR = src/
 SRC = $(wildcard $(SRCDIR)*.c)
