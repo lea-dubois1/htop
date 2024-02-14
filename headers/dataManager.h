@@ -1,12 +1,16 @@
 #ifndef HTOP_DATAMANAGER_H
 #define HTOP_DATAMANAGER_H
 
+#define BASE_DIR_NAME "/proc"
+
+typedef struct processData Process;
 struct processData
 {
     int id;
     char *name;
 };
 
-void getData();
+int getNumberProcesses(char *dirName);
+Process* getData(Process *processes);
 
 #endif //HTOP_DATAMANAGER_H

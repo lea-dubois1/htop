@@ -3,15 +3,14 @@ EXEC = main
 CFLAGS = -Wall -Werror -Wextra -g3
 OBJDIR = obj/
 SRCDIR = src/
-SRC = $(wildcard $(SRCDIR)*.c)
-OBJ = $(SRC:.c=.o)
+SRC = dataManager.c displayHandler.c main.c
+SRCS = $(addprefix $(SRCDIR), $(SRC))
+OBJ = $(SRCS:$(SRCDIR)%.c=$(OBJDIR)%.o)
 
 all : $(EXEC)
 
 $(EXEC) : $(OBJ)
-	$(CC) -o $@ $^
-	cp $(SRCDIR)*.o $(OBJDIR)
-	rm -rf $(SRCDIR)*.o
+	$(CC) -lncurses -o $@ $^
 
 $(OBJDIR)%.o : $(SRCDIR)%.c
 	$(CC) $(CFLAGS) -c -o $@ $<

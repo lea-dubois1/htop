@@ -4,8 +4,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <string.h>
-# include <ctype.h>
+#include <ctype.h>
 #include "../headers/dataManager.h"
+
+#define FILE_TO_READ_NAME "status"
+#define STATUS_FILE_PATH_FORMAT "/proc/%s/status"
 
 /// Check if a char is a number
 /// \param character The char to check
@@ -104,37 +107,57 @@ char* getProcessName(char *processFileFullName)
     return processName;
 }
 
+int getNumberProcesses(char *dirName)
+{
+    DIR *dr = opendir(dirName);
+    struct dirent *dirEntries;
+    int num = 0;
+    while ((dirEntries = readdir(dr)) != NULL)
+    {
+        if(str_is_digit(dirEntries->d_name) == 1)
+        {
+            num++;
+        }
+    }
+    closedir(dr);
+    return num;
+}
+
 /// Get the data of all the running processes
-void getData(){
-    struct processData process;
-    char *baseDirName = "/proc", *fileToReadName = "status";
-
-    struct dirent *dirEntries;  // Pointer for directory entry
-
-    DIR *dr = opendir(baseDirName); // opendir() returns a pointer of DIR type.
+Process* getData(Process *processes)
+{
+    DIR *dr = opendir(BASE_DIR_NAME); // opendir() returns a pointer of DIR type.
+    processes = (Process*) realloc(processes, sizeof(Process) * (getNumberProcesses(BASE_DIR_NAME) + 1));
 
     if (dr == NULL)  // opendir returns NULL if it couldn't open directory
     {
         printf("Could not open current directory" );
     }
 
-    char *fileName;  // Name of the actual file
-    int numLetter;  // Number of letters in the full path of the actual status file
+    struct dirent *dirEntries;  // Pointer for directory entry
 
+    char *fileName;  // Name of the actual file
+    int numLetter;  // Number of letters in the full path of the actual status filedirEntries = readdir(dr)
+
+    int processNum = 0;
     while ((dirEntries = readdir(dr)) != NULL)  // for each line
     {
         fileName = dirEntries->d_name;
         if(str_is_digit(fileName) == 1)
         {
-            numLetter = strlen(baseDirName) + strlen(fileName) + strlen(fileToReadName) + 2;
+            numLetter = strlen(BASE_DIR_NAME) + strlen(fileName) + strlen(FILE_TO_READ_NAME) + 2;
             char processFileFullName[numLetter + 1];
-            snprintf(processFileFullName, sizeof(processFileFullName), "%s/%s/%s", baseDirName, fileName, fileToReadName);  // Write the full name of the source's file in the processFileFullName string
+            snprintf(processFileFullName, sizeof(processFileFullName), STATUS_FILE_PATH_FORMAT, fileName);  // Write the full name of the source's file in the processFileFullName string
 
+            Process process;
             process.id = atoi(fileName);
             process.name = getProcessName(processFileFullName);
-            printf("Process %i : %s\n", process.id, process.name);
+            processes[processNum] = process;
+            processNum++;
         }
     }
-
+    processes[processNum].id = '\0';
+    processes[processNum].name = "\0";
     closedir(dr);
+    return processes;
 }
