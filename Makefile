@@ -10,7 +10,7 @@ OBJ = $(SRCS:$(SRCDIR)%.c=$(OBJDIR)%.o)
 all : $(EXEC)
 
 $(EXEC) : $(OBJ)
-	$(CC) -lncurses -o $@ $^
+	$(CC) -o $@ $^ -lncurses
 
 $(OBJDIR)%.o : $(SRCDIR)%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
