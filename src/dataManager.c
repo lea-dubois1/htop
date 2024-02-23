@@ -35,32 +35,49 @@ int str_is_digit(char *str){
     return 1;
 }
 
-/// Delete left spaces of a string
-/// \param s The string to trim
-/// \return The trimed string
-char *ltrim(char *s)
-{
-    while(isspace(*s)) s++;
-    return s;
-}
-
-/// Delete right spaces of a string
-/// \param s The string to trim
-/// \return The trimed string
-char *rtrim(char *s)
-{
-    char* back = s + strlen(s);
-    while(isspace(*--back));
-    *(back+1) = '\0';
-    return s;
-}
-
 /// Delete left and right spaces of a string
-/// \param s The string to trim
+/// \param src The string to trim
 /// \return The trimed string
-char *trim(char *s)
-{
-    return rtrim(ltrim(s));
+char *trim(char *src){
+    int i = 0;
+    int debut = 0;
+    int firstTime = 1;
+
+    while(src[i] != 0){
+        if(src[i] != ' ' && src[i] != '\t' && src[i] != '\n' && src[i] != '\r' && src[i] != '\v' && src[i] != '\f'){
+            if(firstTime == 1){
+                debut = i;
+                firstTime = 0;
+            }
+        }
+        i++;
+    }
+
+    int fin = 0;
+    int firstTimeEnd = 1;
+
+    while(i >= 0){
+        if(src[i] != ' ' && src[i] != '\t' && src[i] != '\n' && src[i] != '\r' && src[i] != '\v' && src[i] != '\f' && src[i] != 0){
+            if(firstTimeEnd == 1){
+                fin = i;
+                firstTimeEnd = 0;
+            }
+        }
+        i--;
+    }
+
+    int newStrLen = fin - debut + 2;
+
+    char *result = (char*)malloc(sizeof(char) * newStrLen);
+
+    int j = debut;
+
+    while(j <= fin){
+        result[j - debut] = src[j];
+        j++;
+    }
+
+    return result;
 }
 
 /// Copy a string
@@ -73,7 +90,7 @@ char *my_strdup(char *src){
         length++;
     }
 
-    char *copy = (char*)malloc(sizeof(char) * length);
+    char *copy = (char*)malloc(sizeof(char) * length + 1);
 
     length = 0;
 
@@ -81,6 +98,7 @@ char *my_strdup(char *src){
         copy[length] = src[length];
         length++;
     }
+    copy[length] = '\0';
 
     return copy;
 }
@@ -90,26 +108,26 @@ char *my_strdup(char *src){
 /// \return The name of the process
 char* getProcessName(char *processFileFullName)
 {
-    char *processName;
+    char *processName = NULL;
     FILE *stream;
 
     if((stream = fopen(processFileFullName, "r")) != NULL) {
         char *line = malloc(sizeof(char) * 256);
         while (fgets(line, 256, stream) != NULL) { // for each line of the file
             if (strstr(line, "Name") != NULL) {
-                processName = my_strdup(line);
-                processName += 5;
+                processName = my_strdup(line + 5);
                 processName = trim(processName);
             }
         }
     }
-
+    fclose(stream);
     return processName;
 }
 
 int getNumberProcesses(char *dirName)
 {
     DIR *dr = opendir(dirName);
+    if (!dr) return 0;
     struct dirent *dirEntries;
     int num = 0;
     while ((dirEntries = readdir(dr)) != NULL)
@@ -124,10 +142,10 @@ int getNumberProcesses(char *dirName)
 }
 
 /// Get the data of all the running processes
-Process* getData(Process *processes)
+Process* getData()
 {
     DIR *dr = opendir(BASE_DIR_NAME); // opendir() returns a pointer of DIR type.
-    processes = (Process*) realloc(processes, sizeof(Process) * (getNumberProcesses(BASE_DIR_NAME) + 1));
+    Process *processes = (Process*) malloc(sizeof(Process) * (getNumberProcesses(BASE_DIR_NAME) + 1));
 
     if (dr == NULL)  // opendir returns NULL if it couldn't open directory
     {

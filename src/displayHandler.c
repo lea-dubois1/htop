@@ -8,11 +8,14 @@
 #include "../headers/dataManager.h"
 
 #define NUM_STRING 100
+#define NB_DISPLAYED_LINES 34
 
 //void display(Process *processes)
 void display() {
-//    int startRow = 1;
+    int startRow = 0;
     int ch;
+    int processesLength = 0;
+    Process *processes;
 
     initscr(); // Initialiser ncurses
 
@@ -27,10 +30,9 @@ void display() {
 
     scrollok(cpu_win, true);
     scrollok(boite, true);
-    keypad(stdscr, TRUE); // Activer les touches spéciales
+    keypad(stdscr, true); // Activer les touches spéciales
 
-
-    do
+    while (true)
     {
         wclear(cpu_win);
         wclear(boite);
@@ -38,18 +40,42 @@ void display() {
         box(cpu_win, 0, 0);
         box(boite, 0, 0);
 
-        mvwprintw(cpu_win, 1, 1, "HELLO");
+        processesLength = getNumberProcesses(BASE_DIR_NAME);
+
+        processes = getData();
+
+        for (int arrayRow = startRow; arrayRow < startRow + LINES && arrayRow < processesLength; ++arrayRow) {
+            mvwprintw(boite, arrayRow - startRow + 1, 2, "ID : %d, Name : %s", processes[arrayRow].id, processes[arrayRow].name);
+        }
+
+        switch((ch = getch())){
+            case KEY_UP:
+                if (startRow > 0) {
+                    startRow--;
+                }
+                break;
+
+            case KEY_DOWN:
+                if (processesLength - startRow > NB_DISPLAYED_LINES - 1) {
+                    startRow++;
+                }
+                break;
+
+            case 'q':
+            case 'Q':
+                wclear(cpu_win);
+                wclear(boite);
+                endwin();
+                return;
+
+            default:
+                break;
+        }
 
         wrefresh(cpu_win);
         wrefresh(boite);
         refresh();
+        free(processes);
     }
-    while ((ch = toupper(getch())) != 'Q');
 
-    endwin(); // Terminer ncurses
-
-
-//    for (int i = 0; processes[i].id != '\0' && strcmp(processes[i].name, "\0") != 0; i++) {
-//        printf("Process number %i : %s\n", processes[i].id, processes[i].name);
-//    }
 }

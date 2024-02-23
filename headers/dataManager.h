@@ -11,6 +11,6 @@ struct processData
 };
 
 int getNumberProcesses(char *dirName);
-Process* getData(Process *processes);
+Process* getData();
 
 #endif //HTOP_DATAMANAGER_H
