@@ -44,7 +44,7 @@ char *trim(char *src){
     int firstTime = 1;
 
     while(src[i] != 0){
-        if(src[i] != ' ' && src[i] != '\t' && src[i] != '\n' && src[i] != '\r' && src[i] != '\v' && src[i] != '\f'){
+        if(isspace(src[i]) == 0){
             if(firstTime == 1){
                 debut = i;
                 firstTime = 0;
@@ -57,7 +57,7 @@ char *trim(char *src){
     int firstTimeEnd = 1;
 
     while(i >= 0){
-        if(src[i] != ' ' && src[i] != '\t' && src[i] != '\n' && src[i] != '\r' && src[i] != '\v' && src[i] != '\f' && src[i] != 0){
+        if(isspace(src[i]) == 0){
             if(firstTimeEnd == 1){
                 fin = i;
                 firstTimeEnd = 0;
@@ -68,7 +68,7 @@ char *trim(char *src){
 
     int newStrLen = fin - debut + 2;
 
-    char *result = (char*)malloc(sizeof(char) * newStrLen);
+    char *result = (char*)malloc((sizeof(char) * newStrLen) + 1);
 
     int j = debut;
 
@@ -76,6 +76,7 @@ char *trim(char *src){
         result[j - debut] = src[j];
         j++;
     }
+    result[j] = '\0';
 
     return result;
 }
@@ -174,8 +175,6 @@ Process* getData()
             processNum++;
         }
     }
-    processes[processNum].id = '\0';
-    processes[processNum].name = "\0";
     closedir(dr);
     return processes;
 }

@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <curses.h>
-#include <ctype.h>
 
 #include "../headers/displayHandler.h"
 #include "../headers/dataManager.h"
@@ -10,7 +7,6 @@
 #define NUM_STRING 100
 #define NB_DISPLAYED_LINES 34
 
-//void display(Process *processes)
 void display() {
     int startRow = 0;
     int ch;
@@ -44,7 +40,7 @@ void display() {
 
         processes = getData();
 
-        for (int arrayRow = startRow; arrayRow < startRow + LINES && arrayRow < processesLength; ++arrayRow) {
+        for (int arrayRow = startRow; arrayRow < startRow + LINES - 1 && arrayRow < processesLength; ++arrayRow) {
             mvwprintw(boite, arrayRow - startRow + 1, 2, "ID : %d, Name : %s", processes[arrayRow].id, processes[arrayRow].name);
         }
 
@@ -77,5 +73,4 @@ void display() {
         refresh();
         free(processes);
     }
-
 }
